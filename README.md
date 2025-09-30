@@ -194,8 +194,8 @@ This project is licensed under the **Martial Domche** – free for academic and 
 
 ## 📢 Contact  
 
-- 🐦 Twitter: [@TonPseudo](https://twitter.com/martialdomche)  
-- 💼 LinkedIn: [Ton Nom](https://www.linkedin.com/martialdomche)  
-- 📧 Email: [ton.email@gmail.com](mailto:mdomche@gmail.com)  
+- 🐦 Twitter: [@martialdomche](https://twitter.com/martialdomche)  
+- 💼 LinkedIn: [Martial Domche](https://www.linkedin.com/martialdomche)  
+- 📧 Email: [mdomche@gmail.com](mailto:mdomche@gmail.com)  
 
 👉 QRA is designed to save researchers **time and effort**, while ensuring **academic rigor and source fidelity**.  
