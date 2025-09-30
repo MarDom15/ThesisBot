@@ -1,7 +1,7 @@
 # 📘 Quantum Research Assistant (QRA)  
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
-![License](https://img.shields.io/badge/License-MIT-green.svg)
+![License](https://img.shields.io/badge/MartialDomche.svg)
 ![Build](https://img.shields.io/badge/Status-Active-success.svg)
 
 ---
@@ -92,8 +92,8 @@ quantum-research-assistant/
 
 ### 1. Clone the repository  
 ```bash
-git clone https://github.com/username/quantum-research-assistant.git
-cd quantum-research-assistant
+git clone https://github.com/MarDom15/ThesisBot
+cd ThesisBot
 ```
 
 ### 2. Create a virtual environment  
