@@ -1,7 +1,6 @@
 import fitz  # PyMuPDF pour PDF
 from pathlib import Path
 import re
-import pickle
 
 def extract_text_from_pdf(file_path):
     doc = fitz.open(file_path)
@@ -33,18 +32,10 @@ def load_articles(folder=r"C:\Users\marti\Desktop\ThesisBot\data"):
     return articles
 
 if __name__ == "__main__":
-    articles = load_articles("data/articles")
-    paragraphs = []
-    sources = []
-
-    for title, paras in articles.items():
-        for p in paras:
-            if len(p.strip()) > 20:
-                paragraphs.append(p)
-                sources.append(title)
-
-    with open("data/text_chunks.pkl", "wb") as f:
-        pickle.dump({"paragraphs": paragraphs, "sources": sources}, f)
-
-    print(f"Nombre total de segments : {len(paragraphs)}")
-    print("Fichier text_chunks.pkl créé avec succès !")
+    articles = load_articles()
+    print(f"{len(articles)} articles chargés.")
+    # Affiche les 2 premiers segments du premier article
+    first_key = list(articles.keys())[0]
+    print(f"\nPremiers segments de {first_key}:")
+    for seg in articles[first_key][:2]:
+        print(seg, "\n")

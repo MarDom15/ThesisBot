@@ -3,7 +3,7 @@ import faiss
 import numpy as np
 import pickle
 from pathlib import Path
-from extractor import load_articles  # importe ta fonction d'extraction
+from pipeline.extractor import load_articles  # importe ta fonction d'extraction
 
 # Modèle d'embeddings
 model = SentenceTransformer('all-MiniLM-L6-v2')
