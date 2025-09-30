@@ -1,7 +1,7 @@
 # 📘 Quantum Research Assistant (QRA)  
 
 ![Python](https://img.shields.io/badge/Python-3.10+-blue.svg)
-![License](https://img.shields.io/badge/MartialDomche.svg)
+
 ![Build](https://img.shields.io/badge/Status-Active-success.svg)
 
 ---
