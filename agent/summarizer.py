@@ -1,8 +1,17 @@
-from openai import OpenAI
 import pickle
+from transformers import pipeline
+import os
 
 # ------------------ CONFIG ------------------
-client = OpenAI(api_key="TON_OPENAI_API_KEY")
+# Mets ta clé Hugging Face si besoin
+os.environ["HF_API_KEY"] = "YOUR_HF_API_KEY"
+MODEL_NAME = "tiiuae/falcon-rw-1b"
+
+generator = pipeline(
+    "text-generation",
+    model=MODEL_NAME,
+    device=-1  # CPU ; mets device=0 si tu as un GPU
+)
 
 # ------------------ CHARGEMENT DES PARAGRAPHES ------------------
 with open("data/text_chunks.pkl", "rb") as f:
@@ -16,12 +25,21 @@ def synthesize_paragraphs(paragraphs, sources=None):
     for i, p in enumerate(paragraphs):
         source = sources[i] if sources else "Source inconnue"
         combined += f"[{source}]: {p}\n"
-    prompt = f"Fais une synthèse claire et concise de ces passages avec reformulation académique, en conservant les références source :\n\n{combined}"
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role":"user","content":prompt}]
+
+    prompt = (
+        "Fais une synthèse claire et concise de ces passages avec reformulation académique, "
+        "en conservant les références source :\n\n" + combined
     )
-    return response.choices[0].message.content
+
+    result = generator(
+        prompt,
+        max_new_tokens=300,    # combien de tokens générer
+        truncation=True,       # coupe si le texte est trop long
+        do_sample=True,
+        temperature=0.7,
+        top_p=0.9
+    )
+    return result[0]["generated_text"]
 
 # ------------------ BOUCLE INTERACTIVE ------------------
 if __name__ == "__main__":
