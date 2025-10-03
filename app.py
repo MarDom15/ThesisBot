@@ -1,85 +1,63 @@
-import streamlit as st
+import sys
+import os
 from pathlib import Path
-import fitz  # PyMuPDF
-import pickle
 
-# Import des modules internes
-from pipeline.extractor import load_articles
+# Ajouter le dossier parent au path pour retrouver les modules à la racine
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+# Modules internes
+from pipeline.extractor import extract_from_pdf
 from pipeline.vectorizer import embed_paragraphs, build_faiss_index, load_embeddings, load_faiss_index
 from agent.qa_agent import retrieve_top_paragraphs, reformulate_text
 from agent.summarizer import synthesize_paragraphs
 from evaluation.evaluate import coverage_score
 from utils.file_utils import export_pdf
 
-st.set_page_config(page_title="📝 Thesis Assistant AI", layout="wide")
-st.title("📝 Thesis Assistant AI Optimisé")
+# ---------------- CONFIG ----------------
+PDF_PATH = "data/example.pdf"  # chemin vers ton PDF
+TOP_K = 5  # nombre de paragraphes à récupérer
+EMBEDDINGS_FILE = "data/embeddings.pkl"
+FAISS_INDEX_FILE = "data/faiss.index"
 
-# ------------------ Upload d'articles ------------------
-uploaded_files = st.file_uploader(
-    "Téléversez vos articles (PDF/TXT)",
-    accept_multiple_files=True
-)
+def main():
+    # 1. Extraction PDF
+    print("[INFO] Extraction du PDF...")
+    paragraphs = extract_from_pdf(PDF_PATH)
+    print(f"[INFO] {len(paragraphs)} phrases extraites.")
 
-articles = {}
-if uploaded_files:
-    for file in uploaded_files:
-        if file.name.lower().endswith(".pdf"):
-            doc = fitz.open(stream=file.read(), filetype="pdf")
-            text = "".join([page.get_text() for page in doc])
-            articles[file.name] = text.split("\n\n")
-        elif file.name.lower().endswith(".txt"):
-            text = file.read().decode("utf-8")
-            articles[file.name] = text.split("\n\n")
-else:
-    articles = load_articles()
-
-# ------------------ Préparation des paragraphes et sources ------------------
-paragraphs = []
-sources = []
-for title, paras in articles.items():
-    for p in paras:
-        if len(p.strip()) > 20:
-            paragraphs.append(p)
-            sources.append(title)
-
-# ------------------ Embeddings et FAISS ------------------
-if Path("data/embeddings.pkl").exists() and Path("data/index.faiss").exists():
-    embeddings = load_embeddings("data/embeddings.pkl")
-    index = load_faiss_index("data/index.faiss")
-else:
-    embeddings = embed_paragraphs(paragraphs, save_path="data/embeddings.pkl")
-    index = build_faiss_index(embeddings, save_path="data/index.faiss")
-
-# ------------------ Inputs utilisateur ------------------
-subject = st.text_input("Sujet de la thèse / Contexte :")
-question = st.text_input("Pose ta question :")
-top_k = st.slider("Nombre de passages top-k :", min_value=1, max_value=10, value=5)
-
-if st.button("Obtenir réponse"):
-    if not question.strip():
-        st.warning("Veuillez entrer une question.")
+    # 2. Embedding + FAISS
+    if Path(EMBEDDINGS_FILE).exists() and Path(FAISS_INDEX_FILE).exists():
+        print("[INFO] Chargement des embeddings et de l'index FAISS existants...")
+        embeddings = load_embeddings(EMBEDDINGS_FILE)
+        faiss_index = load_faiss_index(FAISS_INDEX_FILE)
     else:
-        # Récupération des passages pertinents
-        top_paras = retrieve_top_paragraphs(question, paragraphs, embeddings, index, top_k=top_k, subject=subject)
-        
-        st.subheader("Passages pertinents avec reformulation :")
-        for i, p in enumerate(top_paras, 1):
-            st.write(f"**Original [{sources[i-1]}] :** {p}")
-            reformulated = reformulate_text(p)
-            st.write(f"**Reformulé :** {reformulated}")
-            st.write("---")
-        
-        # Synthèse globale
-        st.subheader("Synthèse globale :")
-        synth = synthesize_paragraphs(top_paras, sources[:len(top_paras)])
-        st.write(synth)
-        
-        # Score de couverture
-        st.subheader("Score de couverture :")
-        score = coverage_score(synth, top_paras)
-        st.write(f"{score:.2f}")
-        
-        # Export PDF
-        if st.button("Exporter synthèse PDF"):
-            export_pdf(synth, "synthese_these.pdf")
-            st.success("PDF exporté !")
+        print("[INFO] Création des embeddings et de l'index FAISS...")
+        embeddings = embed_paragraphs(paragraphs)
+        faiss_index = build_faiss_index(embeddings)
+        print("[INFO] Sauvegarde embeddings et FAISS...")
+    
+    # 3. Recherche QA
+    query = input("Entrez votre question : ")
+    top_paragraphs = retrieve_top_paragraphs(query, paragraphs, embeddings, faiss_index, top_k=TOP_K)
+    
+    print(f"[INFO] {len(top_paragraphs)} paragraphes pertinents récupérés :")
+    for i, p in enumerate(top_paragraphs):
+        print(f"{i+1}. {p[:100]}...")
+
+    # 4. Synthèse
+    print("[INFO] Synthèse des paragraphes...")
+    summary = synthesize_paragraphs(top_paragraphs)
+    print("\n--- SYNTHÈSE ---")
+    print(summary)
+
+    # 5. Évaluation coverage (optionnel)
+    coverage = coverage_score(summary, top_paragraphs)
+    print(f"\n[INFO] Coverage score : {coverage:.2f}")
+
+    # 6. Export PDF (optionnel)
+    export_path = "output/summary.pdf"
+    export_pdf(summary, export_path)
+    print(f"[INFO] Synthèse exportée dans {export_path}")
+
+if __name__ == "__main__":
+    main()

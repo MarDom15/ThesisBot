@@ -9,7 +9,7 @@ model = SentenceTransformer('all-MiniLM-L6-v2')
 # ------------------ MÉTRIQUES ------------------
 def precision_recall_at_k(predicted, relevant, k=5):
     """
-    predicted : liste des indices des passages récupérés par l'agent
+    predicted : liste des indices des passages récupérés par l'agent est ceci 
     relevant : liste des indices des passages réellement pertinents
     """
     pred_topk = set(predicted[:k])

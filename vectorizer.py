@@ -3,7 +3,8 @@ import faiss
 import numpy as np
 import pickle
 from pathlib import Path
-from pipeline.extractor import load_articles  # importe ta fonction d'extraction
+from extractor import extract_from_pdf  # On utilise ta fonction existante
+import os
 
 # Modèle d'embeddings
 model = SentenceTransformer('all-MiniLM-L6-v2')
@@ -29,6 +30,16 @@ def build_faiss_index(embeddings, save_path=None):
 
 def load_faiss_index(path):
     return faiss.read_index(str(path))
+
+# Remplacement de load_articles
+def load_articles(folder_path):
+    articles = {}
+    for filename in os.listdir(folder_path):
+        if filename.endswith(".pdf"):
+            pdf_path = os.path.join(folder_path, filename)
+            sentences = extract_from_pdf(pdf_path)
+            articles[filename] = sentences
+    return articles
 
 # --- Partie exécutable ---
 if __name__ == "__main__":

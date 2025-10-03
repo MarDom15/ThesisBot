@@ -1,0 +1,1412 @@
+Fais une synthèse claire et concise de ces passages avec reformulation académique, en conservant les références source :
+
+[Synthèse partielle]: Fais une synthèse claire et concise de ces passages avec reformulation académique, en conservant les références source :
+
+[s42484-022-00083-z.pdf]: We develop a fully connected
+QuantumGenerativeAdversarialnetworkandshowhowitcanbeappliedinMathematicalFinance,withaparticularfocus
+onvolatilitymodelling.
+[s42484-022-00083-z.pdf]: Keywords Quantumcomputing GAN Quantumphaseestimation SVI Volatility
+1Introduction two neural networks, a generator and a discriminator,
+contest against each other in a minimax game in order to
+MachineLearninghasbecomeubiquitous,withapplications generateinformationsimilartoagivendataset(Goodfellow
+in nearly every aspect of society today, in particular for et al.
+[s42484-022-00083-z.pdf]: They have been successfully applied in
+image and speech recognition, traffic prediction, product many fields over the past few years, in particular for
+recommendation, medical diagnosis, stock market trading image generation (Yu et al.
+[s42484-022-00083-z.pdf]: 2017),
+and fraud detection.
+[s42484-022-00083-z.pdf]: One specific Machine Learning tool, medicine (Anand and Huang 2018; Zhavoronkov 2019),
+deep neural networks, has seen tremendous developments and in Quantitative Finance (Ruf and Wang 2021).
+[s42484-022-00083-z.pdf]: They
+over the past few years.
+[s42484-022-00083-z.pdf]: Despite clear advances, these however often suffer from instability issues, vanishing
+networks however often suffer from the lack of training gradient and potential mode collapse (Saxena and Cao
+data:inFinance,timeseriesofastockpriceonlyoccuronce, 2021).
+[s42484-022-00083-z.pdf]: Even Wasserstein GANs, assuming the Wasserstein
+physicalexperimentsaresometimesexpensivetorunmany distance from optimal transport instead of the classical
+times.Topalliatethis,attentionhasturnedtomethodsaimed Jensen–Shannon Divergence, are still subject to slow
+atreproducingexistingdatawithahighdegreeofaccuracy.
+[s42484-022-00083-z.pdf]: convergenceissuesandpotentialinstability(Gulrajanietal.
+[s42484-022-00083-z.pdf]: Amongthese,GenerativeAdversarialNetworks(GAN)are 2017).
+[s42484-022-00083-z.pdf]: aclassofunsupervisedMachineLearningdeviceswhereby In order to improve the accuracy of this method, Lloyd
+and Weedbrook (2018) and Dallaire-Demers and Killo-
+ran (Dallaire-Demers and Killoran 2018) simultaneously
+AntoineJacquier introduced a quantum component to GANs, where the
+a.jacquier@imperial.ac.uk
+data consists of quantum states or classical data while the
+two players are equipped with quantum information pro-
+AmineAssouel
+amine.assouel@ens-paris-saclay.fr cessors.
+[s42484-022-00083-z.pdf]: Preliminary works have demonstrated the quality
+of this approach, in particular for high-dimensional data,
+AlexeiKondratyev
+thus leveraging on the exponential advantage of quantum
+a.kondratyev@imperial.ac.uk
+computing (Huang et al.
+[s42484-022-00083-z.pdf]: An experimental proof-of-
+principle demonstration of QuGAN in a superconducting
+1 ENSParis-Saclay,Gif-sur-Yvette,France quantum circuit was shown in Hu et al.
+[s42484-022-00083-z.pdf]: (2019), while
+2 Department of Mathematics, Imperial College London, in Stein et al.
+[s42484-022-00083-z.pdf]: (2020) the authors made use of quantum
+London,UK fidelity measurements to propose a loss function acting on
+3 AlanTuringInstitute,London,UK quantum states.
+[s42484-022-00083-z.pdf]: Further recent advances, providing more
+4 AbuDhabiInvestmentAuthority(ADIA),AbuDhabi,United insights on how quantum entanglement can play a deci-
+ArabEmirates sive role, have been put forward in Niu et al.
+[s42484-022-00083-z.pdf]: 28 Page 2 of 19 QuantumMachineIntelligence(2022)4:28
+While actual Quantum computers are not available yet, an important focus in Quantitative Finance (Koshiyama
+Noisy intermediate-scale quantum (NISQ) algorithms are et al.
+[s42484-022-00083-z.pdf]: 2020; Wiese
+already here and allow us to perform quantum-like opera- et al.
+[s42484-022-00083-z.pdf]: 2020), we provide an example of application for
+tions (Bharti et al.
+[s42484-022-00083-z.pdf]: The importance of such compu- QuGAN for volatility modelling in Section 4, hoping to
+tationsappearcanbeseenthroughthelensofdata.Indeed, bridge the gap between the Quantum Computing and the
+overthepastfiveyears,QuantitativeFinancehasputalarge Quantitative Finance communities.
+[s42484-022-00083-z.pdf]: For completeness, we
+emphasisondata-basedmodels(withtheuseofdeeplearn- gather some essential background on Quantum Computing
+ingandreinforcementlearning),withtheobviousincreasing inAppendixA.
+[s42484-022-00083-z.pdf]: need for large amount of data for training purposes.
+[s42484-022-00083-z.pdf]: Gen-
+erative models (Kondratyev and Schwarz 2019) have thus
+found themselves key to help generate (any amount of) 2Aquantumversionofanon-linear
+realistic data that can then be used for training, and any quantumneuron
+computational speedup (due to the extremely large size of
+these datasets), is urgently welcome; in particular that of The quantum phase estimation procedure lies at the very
+quantum computing.
+[s42484-022-00083-z.pdf]: In fact, quoting from (Herman et al.
+[s42484-022-00083-z.pdf]: coreofbuildingaquantumcounterpartforaneuralnetwork.
+[s42484-022-00083-z.pdf]: 2022), ‘Numerous financial use cases require the ability In this part, we will mainly focus on how to build a
+to assess a wide range of potential outcomes.
+[s42484-022-00083-z.pdf]: To do this, singlequantumneuron.Asthefundamentalbuildingblock
+banks employ algorithms and models that calculate statis- of artificial neural networks, a neuron classically maps a
+tical probabilities.
+[s42484-022-00083-z.pdf]: Such techniques are fairly effective, but normalised input x 0 1 to an
+0 1
+not infallible.
+[s42484-022-00083-z.pdf]: In a world where huge amounts of data are output x w , where w 1 1
+0 1
+generated daily, computers that can compute probabilities is the weight vector, for some activation function .
+[s42484-022-00083-z.pdf]: The
+accurately are becoming a predominant need.
+[s42484-022-00083-z.pdf]: For this rea- non-linearquantumneuronrequiresthefollowingsteps:
+son,severalbanksareturningtoquantumcomputinggiven
+Encodeclassicaldataintoquantumstates(Section2.2);
+its promise to analyse vast amounts of data and compute
+Perform the (quantum version of the) inner product
+results faster and more accurately than what any classical
+x w(Section2.3);
+computerhaseverbeenabletodo’.
+[s42484-022-00083-z.pdf]: Applying the (quantum version of the) non-linear
+We focus here on building a fully connected Quantum
+activationfunction(Section2.4).
+[s42484-022-00083-z.pdf]: Generative Adversarial network (QuGAN) 1, namely an
+entirequantumcounterparttoaclassicalGAN.Aquantum Before diving into the quantum version of neural
+versionofGANwasfirstintroducedinDallaire-Demersand networks, we recall the basics of classical (feedforward)
+Killoran(2018)andLloydandWeedbrook(2018),showing neuralnetworks,whichweaimatmimicking.
+[s42484-022-00083-z.pdf]: that it may exhibit an exponential advantage over classical
+adversarialnetworks.Weshouldalsoliketomentionsome 2.1Classicalneuralnetworkarchitecture
+closely related works, in particular Situ et al.
+[s42484-022-00083-z.pdf]: (2020),
+makingcleveruseofMatrixProductState(MPS)quantum Artificialneuralnetworks(ANNs)areasubsetofmachine
+circuits, Nakaji and Yamamoto (2021) for classification learning and lie at the heart of Deep Learning algorithms.
+[s42484-022-00083-z.pdf]: (2019), where the generated distributions Their name and structure are inspired by the human
+arebrilliantlyusedtobypasstheneedtoloadclassicaldata brain (Marblestone et al.
+[s42484-022-00083-z.pdf]: 2016), mimicking the way that
+in quantum computers (here for option pricing purposes), biological neurons signal to one another.
+[s42484-022-00083-z.pdf]: They consist of
+a standard bottleneck in quantum algorithms.
+[s42484-022-00083-z.pdf]: However, all several layers, with an input layer, one or more hidden
+these advances use a quantum generator and a classical layers, and an output layer, each one of them containing
+discriminator, slightly different from our approach here, severalnodes.AnexampleofANNisdepictedinFig.1.
+[s42484-022-00083-z.pdf]: whichbuildsafullyquantumGAN.
+[s42484-022-00083-z.pdf]: For a given an input vector x ,
+1
+1
+Thepaperisstructuredasfollows:InSection2,werecall the connectivity between x and the th neuron of the
+the basics of a classical neural network and show how to 1
+first hidden layer (Fig.
+[s42484-022-00083-z.pdf]: 1) is done via
+1 1
+build a fully quantum version of it.
+[s42484-022-00083-z.pdf]: This is incorporated in
+, where is called the activation function.
+[s42484-022-00083-z.pdf]: the full architecture of a Quantum Generative Adversarial 1 1
+By denoting the vector of the th hidden layer,
+Network in Section 3.
+[s42484-022-00083-z.pdf]: Since classical GANs are becoming
+where and the connectivity
+1
+modelgeneralisesitselftothewholenetwork:
+1The terminology ‘QuGAN’ should not be confused with ‘QGAN’,
+usedtodenotequantisedversionsofGAN,asin(Wangetal.2019),
+nor with ‘Quant GAN’, which refers (Wiese et al.
+[s42484-022-00083-z.pdf]: 2020) to the use
+1
+ofGANinQuantitativeFinance;neitherQuantGANnorQGANare 1 1 1 (2.1)
+relatedwhatsoevertoQuantumComputing.
+[s42484-022-00083-z.pdf]: 1
+QuantumMachineIntelligence(2022)4:28 Page 3 of 19 28
+Fig.1 ANNwithoneinput
+layer,2hiddenlayersandone
+outputlayer
+where 1 .
+[s42484-022-00083-z.pdf]: Therefore for hidden 2.3Quantuminnerproduct
+1
+layers the entire network is parameterised by
+where first 1 , then Wenowshowhowtobuildthequantumversionoftheinner
+1 and1 .Foragiventrainingdata productperformingtheoperation
+1
+setofsize , ,thegoalofaneuralnetwork
+1
+istobuildamappingbetween 1 and 1 .
+[s42484-022-00083-z.pdf]: The idea for the neural network structure comes from the
+Kolmogorov-ArnoldrepresentationTheorem(Arnold1957; Denotethetwo-qubitcontrolledZ-Rotationgateby
+Kolmogorov1956):
+1 0 0 0
+Theorem 2.1 Let 0 1 be a contin-
+0 1 0 0
+uous function.
+[s42484-022-00083-z.pdf]: There exist sequences 1 2 and c R 0 0 1 0
+1 2 1 of continuousfunctionsfrom to 0 0 0 e2i
+suchthatforall 0 1 ,
+1
+where isthephaseshiftwithperiod .For 0 1 and
+2 1 0 1 ,notethat,for ,
+1 .
+-00083-z.pdf]: (2020),
+[s42484-022-00083-z.pdf]: and
+[s42484-022-00083-z.pdf]: (2020).
+[s42484-022-00083-z.pdf]: In
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf]:
+[s42484-022-00083-z.pdf
+[Synthèse partielle]: Fais une synthèse claire et concise de ces passages avec reformulation académique, en conservant les références source :
+
+[s42484-022-00083-z.pdf]: (2.2) 2
+1 1
+1 1 2i
+R 0 exp 1
+c
+The representation of resembles a two-hidden layer 2 2 2
+ANN,where aretheactivationfunctions.
+[s42484-022-00083-z.pdf]: Indeed,either 0andthen 0 sothat
+2.2Quantumencoding
+1 1
+R 0 0 1 0
+c
+Since a quantum computer only takes qubits as inputs, we 2 2
+firstneedtoencodetheclassicaldataintoaquantumstate.
+[s42484-022-00083-z.pdf]: For 0 1 and ,denoteby 1 2 or 1andhence
+2 22 2
+the -binaryapproximationof ,whereeach belongs
+to 0 1 , for 1 2 .
+[s42484-022-00083-z.pdf]: The quantum code for the 1 1 2i
+R 0 1 exp 1 1 .
+[s42484-022-00083-z.pdf]: c
+classicalvalue isthendefinedviathisapproximationas 2 2 2
+The gate R applies to two qubits where the first one
+1 2 1 2 c
+constitutes what is called an ancilla qubit since it controls
+andthereforetheencodingforthevectorxis the computation.
+[s42484-022-00083-z.pdf]: From there one should define the ancilla
+register that is composed of all the qubits that are used as
+x 01 02 0 11 1 .
+[s42484-022-00083-z.pdf]: 28 Page 4 of 19 QuantumMachineIntelligence(2022)4:28
+2.3.1Thecasewherewithmancillaqubits we consider U 1 2 R 2 2
+andx w 0, ,2m 1 w2 0 1c 22
+1 2 R 1 .First,wehave
+0 1c 22
+The first part of the circuit consists of applying Hadamard
+1 2 22 1
+gatesontheancillaregister 0 ,whichproduces 1
+1
+R x
+1 2 1 0 1
+c 22 22
+0
+H 0 x x .
+[s42484-022-00083-z.pdf]: (2.4)
+2 1 x w
+0 0 1 0 exp 2i 1 x
+22 22
+The goal here is then to encode as a phase the result of
+the inner product x w. With the binary approximation 2.3 result to which we apply 1 2 R 2 2
+for x and ancilla qubits, define for 1 , 0 1c 22
+whichyields
+0 1 and 1 , R , the
+c
+R matrixappliedtothequbit withthe thqubitof
+c
+1 x w x w
+theancillaregisterascontrol.Finally,introducetheunitary 0 exp 2i 2 1 0 exp 2i 1 x
+22 22 22
+operator
+achievingtheproofof2.6.
+[s42484-022-00083-z.pdf]: (2.5) From the definition of the Quantum Fourier transform
+2
+0 0 1 inA.3,ifx w 0 2 1 ,theresultingstateis
+Proposition 2.2 The following identity holds for all Uw H 00 x q x q x w x.
+: ThusonlyapplyingtheQuantumInverseFourierTransform
+2 1 would be enough to retrieve x w .
+[s42484-022-00083-z.pdf]: The pseudo-code is
+1 x w
+Uw H 0 x exp 2i x detailedinAlgorithm1andthequantumcircuitinthecase
+2 2
+0 2 is depicted in Fig.
+[s42484-022-00083-z.pdf]: 2 (and detailed in
+(2.6) Example2.3).
+[s42484-022-00083-z.pdf]: where
+Example2.3 Tounderstandthecomputationsperformedby
+1 the quantum gates, consider the case where 2.
+x w
+Therefore we only need 2 2 qubits to represent each
+2
+0 1 element of the dataset which constitute the main register.
+[s42484-022-00083-z.pdf]: isthe -binaryapproximationofx w. Introduceanancillaregistercomposedof 2qubitseach
+initialisedat 0 ,andsupposethattheinputstateonthemain
+Proof We prove the proposition for 2 for register is x .
+[s42484-022-00083-z.pdf]: The goal here is then to encode as a phase
+simplicity and the general case is analogous.
+[s42484-022-00083-z.pdf]: Therefore theresultoftheinnerproductx wwherew 0 1 .
+[s42484-022-00083-z.pdf]: Algorithm1 QuantumInnerProduct(QIP)(w x Uw )
+QuantumMachineIntelligence(2022)4:28 Page 5 of 19 28
+Fig.2 QIPcircuitfor 2
+ancillaqubits.The line
+representstheclassicalregister
+fromwhichweretrievethe
+outcomesofthemeasurements.
+[s42484-022-00083-z.pdf]: Thecontrolledgate performs
+as 1 2
+11 1 1 1 1 e i 4 2
+11 1 0 1 0 2
+Sointhisexampletheentirewavefunctioncombiningboth tohavew 1 1 ,sothat x w .Thenoneshould
+themainregister’squbitsandtheancillaregister’squbitsis have (thenumberofancillas)largeenoughsothat
+1
+encoded in six qubits.
+[s42484-022-00083-z.pdf]: By denoting R the R
+c c x w
+matrix applied to the first qubit of the ancilla register and 1 (2.7)
+2
+2
+thequbit ,and R the R matrixappliedto
+c c
+thesecondqubitoftheancillaregisterandthequbit .
+[s42484-022-00083-z.pdf]: Having these constrains
+2
+Usingthegatesin2.5,namely respected, one obtains 1, which is not enough since
+we should have 0 1 instead.
+[s42484-022-00083-z.pdf]: The main idea behind
+1 2 solving that is based on computing x w instead of x w
+U R 1 and 2
+w1 c 21 whichmeansdividingby2alltheparametersofthe R
+c
+0 1
+gates.
+[s42484-022-00083-z.pdf]: Indeed with 2.7, we have 2 x w 2 , and
+2
+1 2 1 2 thus 2 1 1x w 2 1.
+[s42484-022-00083-z.pdf]: 2
+w2 c 22 c 22
+0 1 0 1 In the case where x w 0 we have x w 0 2 1
+2
+and then by defining 1 x w we then obtain
+Remark2.4 Thereisaninterestingandpotentiallyveryuse- 2 2
+0 1 , therefore the QPE can produce an
+ful difference here between the quantum and the classical 2
+approximation of as put forward in Algorithm 2
+versionsofafeedforwardneuralnetwork;intheformer,the
+whichthencanbemultipliedby2 1toretrievex w.
+inputxisnotlostafterrunningthecircuit,whilethisinforma-
+tionislostintheclassicalsetting.Thisinparticularimplies In the case where x w 0, then x w
+2
+thatitcanbeusedagainforfreeinthequantumsetting.
+[s42484-022-00083-z.pdf]: As above, 1 x is an eigenvector
+of 1 R 1 2 with corresponding
+2.3.2Thecasex w 0, ,2m 1 0 1c 2
+x w x w
+eigenvalue exp 2i 2 exp 2i 1 2 .
+[s42484-022-00083-z.pdf]: What happens if x w is not a integer and x w 0?
+[s42484-022-00083-z.pdf]: 2 2
+Again,theshortansweristhatweareabletoobtainagood Defining 1 2 x w 1 1 x w wethen
+2 2 2 2
+approximation of x w, which is already an approximation
+obtain 1 1 whichaQPEprocedurecanestimate
+ofthetruevalueoftheinnerproductx w.Indeed,withthe 2
+andfromwhichwecanretrievex w
+gates constructed above, QIP performs exactly like QPE.
+[s42484-022-00083-z.pdf]: Just a quick comparison between what is obtained at stage Forvaluesof measuredin 0 1 1 1 wearesureabout
+2 2
+3 of the QPE Algorithm (Algorithm 2) and the output the associated value of the inner product.
+[s42484-022-00083-z.pdf]: This means that
+obtainedatthethirdstageoftheQIP2.6wouldbeenough forafixedx,themap
+to state that the QIP is just an application of the QPE
+1 1
+procedure.
+[s42484-022-00083-z.pdf]: Thus 1 R 1 is a unitary 0 1 x w
+0 1c 2 2 2
+matrix such that 1 x is an eigenvector of eigenvalue
+is injective.
+[s42484-022-00083-z.pdf]: A measurement output equal to could
+exp 2i x w .
+[s42484-022-00083-z.pdf]: 2 mean either that x w 2 or x w 2 , which could
+Let 1 x w; the QPE procedure (Appendix A) bepreventedforw 1 1 and largeenoughsuchthat
+2
+can only estimate 0 1 .
+[s42484-022-00083-z.pdf]: Under these circumstances, can be extended to
+and secondly 1 can also happen.
+[s42484-022-00083-z.pdf]: Therefore such aninjectivefunctionon 0 1 ,with1beingexcludedsince
+circumstanceshavetobeaddressed.Onefirststepwouldbe theQPEcanonlyestimatevaluesin 0 1 .
+[s42484-022-00083-z.pdf]: 28 Page 6 of 19 QuantumMachineIntelligence(2022)4:28
+2.4Quantumactivationfunction distinguishingrealdata(fromatrainingdatabase)fromgen-
+erated ones.
+[s42484-022-00083-z.pdf]: As put forward in Goodfellow et al.
+[s42484-022-00083-z.pdf]: (2014),
+Weconsideranactivationfunction .Aclassical the generative model can be thought of as an analogue to a
+1
+exampleisthesigmoid 1 e .Thegoalhere teamofcounterfeiters,tryingtoproducefakecurrencyand
+is to build a circuit performing the transformation use it without detection, while the discriminator plays the
+where and are the quantum encoded role of the police, trying to detect the counterfeit currency.
+[s42484-022-00083-z.pdf]: versions of their classical counterparts as in Section 2.2.
+[s42484-022-00083-z.pdf]: Competitioninthisgamedrivesbothteamstoimprovetheir
+Again, we shall appeal to the Quantum Phase Estimation methodsuntilthecounterfeitsareindistinguishablefromthe
+algorithm.
+[s42484-022-00083-z.pdf]: For a -qubit state 2 , we genuine articles.
+[s42484-022-00083-z.pdf]: Under reasonable assumptions (the strat-
+1
+wishtobuildamatrixU suchthat egyspacesoftheagentsarecompactandconvex)thegame
+2
+hasaunique(Nash)equilibriumpoint,wherethegenerator
+U e2i .
+[s42484-022-00083-z.pdf]: isabletoreproduceexactlythetargetdatadistribution.There-
+fore,inaclassicalsetting,thegeneratorG,parameterisedby
+Considering
+avectorofparameters ,producesarandomvariable ,
+U Diag e2i 0 e2i 1 e2i 2 e2i 2 1 whichwecanwriteasthemap
+G .
+[s42484-022-00083-z.pdf]: then, for ancilla qubits, the Quantum Phase estimation
+yields The goal of the discriminator D, parameterised by , is
+to distinguish samples x of from x , where
+Real
+QPE 0
+x hasbeensampledfromtheunderlyingdistribution
+Real
+ofthedatabase .ThemapDthusreads
+whereagain isthe -bitbinaryfractionapproximation
+for as detailed in Algorithm 2.
+[s42484-022-00083-z.pdf]: 3, we can see
+D x x sampledfrom .
+[s42484-022-00083-z.pdf]: that the information flows from x to
+01 11 21 31
+theregisterattachedto toobtaintheinnerproductand We aim here at mimicking this classical GAN architecture
+2
+from the register to for the activation of the inner into quantum version.
+[s42484-022-00083-z.pdf]: Not surprisingly, we first build a
+2 1
+product.Thisexplainswhyonlymeasuringtheregister quantum discriminator, followed by a quantum generator,
+1
+isenoughtoretrieve x w .
+[s42484-022-00083-z.pdf]: andwefinallydevelopthequantumequivalentofthezero-
+sum game, defining an objective loss function acting on
+quantumstates.
+[s42484-022-00083-z.pdf]: 3QuantumGANarchitecture
+3.1Quantumdiscriminator
+A Generative Adversarial Network (GAN) is a network
+composedoftwoneuralnetworks.Inaclassicalsetting,two InthecaseofafullyconnectedquantumGAN—whichwe
+agents,thegeneratorandthediscriminator,competeagainst study here — where both the discriminator and generator
+each other in a zero-sum game (Kakutani 1941), playing are quantum circuits, one of the main differences between
+in turns to improve their own strategy; the generator tries a classical GAN and a QuGAN lays in the input of
+to fool the discriminator while the latter aims at correctly the discriminator.
+[s42484-022-00083-z.pdf]: Indeed, as said above, in a classical
+Fig.3 Quantumsingleneuron
+for x 24 oneancillaqubit
+2 fortheQIPimplemented
+viathecontrolledgateUw1for
+1 14,andoneancilla
+qubit 1 fortheactivation
+function
+QuantumMachineIntelligence(2022)4:28 Page 7 of 19 28
+Fig.4 Classicalperceptron
+mappingx to
+x w
+discriminator the input is a sample x generated by the Thisapproachofbuildingthecircuitisnewsinceinthe
+generatorG,whereas in aquantumdiscriminatortheinput papers that use quantum discriminators, the circuits that
+isawavefunction are used are what is called ansatz circuits (Braccia et al.
+[s42484-022-00083-z.pdf]: 2 1 2021), in other words generic circuits built with layers
+(3.1) of rotation gates and controlled rotation gates (see 3.6
+0 and 3.7 below for the definition of these gates).
+[s42484-022-00083-z.pdf]: Such
+ansatz circuits are therefore parameterised circuits as put
+generated by a quantum generator.
+[s42484-022-00083-z.pdf]: In such a setting, the
+forward in Chakrabarti et al.
+ethattheycanbeactivatedinanyorder.
+[s42484-022-00083-z.pdf]: 0 exp 2i
+1 exp 2i
+2 1 2 1
+2 2 1 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+2 1 2 1
+
+[Synthèse partielle]: Fais une synthèse claire et concise de ces passages avec reformulation académique, en conservant les références source :
+
+[s42484-022-00083-z.pdf]: (2019), where generally an
+goal is to create a wave function of the form 3.1 which is
+interpretation on the circuit’s architecture performing as
+a physical way of encoding a given discrete distribution,
+a classifying neural network cannot be made.
+[s42484-022-00083-z.pdf]: As pointed
+namely
+out in Braccia et al.
+[s42484-022-00083-z.pdf]: (2021), the architectures of both
+2 foeach 0 2 1
+the generator and the discriminator are the same, which
+(3.2)
+on the one hand solves the issue of having to monitor
+where 0 1 2 with 2 1 1.
+[s42484-022-00083-z.pdf]: We whether there is a imbalance in terms of expressivity
+0 2 1 0
+choosehereasimplearchitectureforthediscriminator,asa between the generator and the discriminator; however, on
+quantum version of a perceptron with a sigmoid activation the other hand,3 it prevents us from being able to give a
+function(Fig.4).
+[s42484-022-00083-z.pdf]: straightforwardinterpretationforthegivenarchitectures.
+[s42484-022-00083-z.pdf]: Fig.5 Quantumperceptronwith
+w 4andoneancillaqubitfor
+theinnerproduct( 2 1)and
+oneancillaqubitforthe
+activation( 1 1).Herewe
+onlymeasuretheresultproduced
+bytheactivationfunction
+28 Page 8 of 19 QuantumMachineIntelligence(2022)4:28
+The main task here is then to translate these classical thegeneratedone .
+[s42484-022-00083-z.pdf]: (2019)where—for
+computationstoaquantuminputforthediscriminator.This adistributionwith23possibleoutcomes—theauthorsusea
+challenge has been taken up in both Sections 2.3 and 2.4 classicaldiscriminatorcomposedofa512-nodeinputlayer,
+where we have built from scratch a quantum perceptron a 256-node hidden layer, and a single-node output layer;
+which performs exactly like a classical perceptron.
+[s42484-022-00083-z.pdf]: There in contrast, our quantum discriminator has only 3.
+is however one main difference in terms of interpretation: Thereforewhileachievingcomparableresults,ourapproach
+let thewave function3.1betheinputforthediscriminator avoidsanover-parameterisationofthediscriminator.While
+with 2 and, for (defined in A.4), this over-parameterisation may be useful (for example to
+1
+define .DenoteD w reduce the error of the estimation made by sampling from
+1 2 1 2
+thetransformationperformedbytheentirequantumcircuit the generator, as in Zoufal et al.
+[s42484-022-00083-z.pdf]: (2019)), it is not always
+depicted in Fig.
+[s42484-022-00083-z.pdf]: 5, where D w is unitary and w , desirableasinterpretabilityofthenetworkmaysuffer(Mol-
+namelyfor ancillaqubits, nar2020).Aprecisecharacterisationoftheoptimalnetwork
+1 2
+(number of gates for example) is still an open question, as
+D w 0 1 2 w
+inclassicalmachinelearning,whichweshallinvestigatein
+thefuture.
+[s42484-022-00083-z.pdf]: where w 2 1 and w 2 2 and where
+we only measure w .
+[s42484-022-00083-z.pdf]: Thus, for the input 3.1, the Example3.1 Asanexample,consider 1ancillaqubit
+2
+discriminator outputs the wave function (with 1 2 fortheinnerproduct, 1 1ancillaqubitfortheactivation,
+ancillaqubits) target 0 0 1 1 and 0 0 1 1 .
+[s42484-022-00083-z.pdf]: Asweonlymeasuretheoutcomeproducedbytheactivation
+2 1
+D w 0 1 2 w w .
+[s42484-022-00083-z.pdf]: (3.3) function, the only possible outcomes are 0 and 1 .
+[s42484-022-00083-z.pdf]: 0 Therefore, measuring the output of the discriminator only
+Therefore,inaQuGANsettingthegoalforthediscrimina- consists of a projection on either 0 or 1 .
+[s42484-022-00083-z.pdf]: Define these
+tor is to distinguish the target wave function from projectors
+target
+0 0 I 2 and 1 1 I 2
+0 d 2 1 2 1 d 2 1 2
+where 1 and 1 since in our toy example input distribution Fake and measuring 1 as labelling it
+2
+the wave functions encoding the distributions are 1-qubit Real, the optimal discriminator with parameter w would
+distributions.
+[s42484-022-00083-z.pdf]: Interpreting measuring 0 as labelling the performas
+2 1
+2
+D w 0 1 2 0 w D w 0 1 2 1
+0
+0
+2 1
+2
+D w 0 1 2 1 w D w 0 1 2 1 (3.4)
+target 1 target
+0
+wherestillinourtoyexamplewehave 1, 1 1and visualisation of the way an optimal quantum discriminator
+2 1.Here couldbeanypositiveinteger.Weillustrate worksasitseparatesthetwocomplementaryregions
+thecircuitinFig.5.
+[s42484-022-00083-z.pdf]: 2 1 1 2 1 1
+3.1.1Blochsphererepresentation suchthat 2 1
+0 0
+The Bloch sphere (Nielsen and Chuang 2000) is important 2 1 2 1
+in QuantumComputing,providinga geometrical represen- suchthat 2 1 (3.5)
+tation of pure states.
+[s42484-022-00083-z.pdf]: In our case, it yields a geometric 2 1 2 1
+QuantumMachineIntelligence(2022)4:28 Page 9 of 19 28
+Fig.6 Blochspheres
+representationsfor target (left)
+and (right)wherethereis
+nophaseshiftbetween 0
+and 1 andwherethesizesof
+thelobesareproportionaltothe
+probabilityofmeasuringthe
+associatedstates
+where isthetotalnumberofqubitsfor 3.2Quantumgenerator
+1 2
+the inputs of the discriminator.
+[s42484-022-00083-z.pdf]: The optimal discriminator
+D w wouldperformas The quantum generator is a quantum circuit producing a
+wave function that encodes a discrete distribution.
+[s42484-022-00083-z.pdf]: Such a
+circuittakesasaninputthegroundstate 0 1 2 and
+D w Fake and D w Real almostsurely
+outputsawavefunction parameterisedby ,theset
+of parameters for the discriminator.
+[s42484-022-00083-z.pdf]: We recall here a few
+quantum gates that will be key to constructing a quantum
+where Fake 0 0 and Real 0 0 .
+[s42484-022-00083-z.pdf]: Recall that a quantum gate can be viewed as a
+Now, the challenge lays in finding such an optimal
+unitarymatrix;ofparticularinterestwillbegatesactingon
+discriminator; however, one should note that the nature
+two (or more) qubits, as its allows quantum entanglement,
+of the state Fake plays a major role in finding such a
+thusfullyleveragingthepowerofquantumcomputing.The
+discriminator.Therefore,inthefollowingpartwefocuson
+NOTgateXactsononequbitandisrepresentedas
+thegeneratorresponsibleforgenerating Fake .
+[s42484-022-00083-z.pdf]: Example 3.2 Consider Example 3.1 with 0 1
+0 1 X
+1 1 and 3 1 .Thestates 1 0
+2 2 0 1 2 2 target
+and areshowninFig.6.Thewavefunctionproduced
+so that X0 1 and X1 0 .
+[s42484-022-00083-z.pdf]: The R is a one-qubit
+by the discriminator is composed of three qubits ( 1, Y
+1
+gaterepresentedbythematrix
+1 and 1 qubit for the input wave function 3.3);
+2
+therefore, one optimal transformation for the discriminator
+having as an input is one such that the first qubit cos sin
+target R 2 2 (3.6)
+Y
+nevercollapsesontothestate 0 (Fig.7).
+[s42484-022-00083-z.pdf]: sin cos
+2 2
+Fig.7 Left:
+D 1 0 0 target .Total
+systempost-oneoptimal
+discriminatortransformation.
+[s42484-022-00083-z.pdf]: Thefirstqubitnevercollapses
+onto 0 andthereforesucha
+discriminatorisoptimalat
+labelling target asReal.Right:
+D 0 0 .Totalsystem
+2
+post-oneoptimaldiscriminator
+transformation.Thefirstqubit
+nevercollapsesonto 1 and
+thereforesuchadiscriminatoris
+optimalatlabelling Fake
+28 Page 10 of 19 QuantumMachineIntelligence(2022)4:28
+thusperformingas
+R 0 cos 0 sin 1 and R 1 cos 1 sin 0 .
+[s42484-022-00083-z.pdf]: Y Y
+2 2 2 2
+The R Gate is the controlled version of the R gate, We then proceed by induction: start with a random draw
+c Y Y
+actingontwoqubits,onecontrolqubitandonetransformed of X 1 as a Bernoulli sample with failure probability x1 .
+[s42484-022-00083-z.pdf]: qubit, producing quantum entanglement.
+[s42484-022-00083-z.pdf]: The R Y transfor- Assuming that X 1 has been sampled as x 1 for some
+mationappliesonthesecondqubitonlywhenprovidedthe 1 , sample X from a Bernoulli distribution
+control qubit is in 1 , otherwise leaves the second qubit with failure probability x 1 .
+[s42484-022-00083-z.pdf]: The quantum circuit will
+unaltered.Itsmatrixrepresentationis equivalently consist of stages, where at each stage 1
+we only work with the first qubits, and at the end
+1 0 0 0
+of each stage there is the correct distribution for the first
+0 1 0 0
+c R Y 0 0 cos sin (3.7) qubits in the sense that, upon measuring, their distribution
+2 2 coincideswiththatofX .
+[s42484-022-00083-z.pdf]: 2 2 The first step is simple: a single Y-rotation of the first
+Given qubitsletX 1 bearandomvector qubit with angle 0 satisfying cos 2 x1 .
+[s42484-022-00083-z.pdf]: In
+takingvaluesin 0 1 .Set other words, with U R , we map 0 to U 0
+1 Y 1
+x X x forx .
+[s42484-022-00083-z.pdf]: Clearly, when measuring the first
+qubit,weobtainthecorrectlaw.Now,inductively,for2
+Whenbuildingthegeneratorwearelookingforaquantum
+, suppose the first 1 qubits fixed, namely in the
+circuitthatimplementsthetransformation
+state
+0 x ei x x .
+[s42484-022-00083-z.pdf]: x 0 1
+x 1 1
+x 01
+x 1 1
+Wecouldfollowaclassicalalgorithm.For1 ,let
+For each x , let 0 satisfy
+x and,givenx , 1 1 x 1
+1 cos 1 andconsiderthegateC acting
+2 x 1 x 1 x 1
+0 if 1
+x 1 0X x if2 .
+[s42484-022-00083-z.pdf]: (3.8) on the first qubits which is a R Y on the last qubit ,
+1 1 controlledonwhetherthefirst 1qubitsareequaltox .
+[s42484-022-00083-z.pdf]: 1
+Wethenhave
+x 0 1 x 1 ify x
+y 0 x 1 1 x 1 1 1 (3.9)
+x 1 y 0 fory x .
+[s42484-022-00083-z.pdf]: 1
+Therefore, defining U C , and noting
+x 1 1 x 1
+that the order of multiplication does not affect the
+computationsbelow,itfollowsthat
+U x 0 1 x 1 1 0
+x 1 1 x 1 x 1 1 x 1 x 1
+x 1 1 x 1 1
+x 0
+x
+x
+where the last equality follows from properties of condi- concludes the inductive step.
+[s42484-022-00083-z.pdf]: The generator has therefore
+tionalexpectationssince been built accordingly to a ‘classical’ algorithm, however
+only up until (see Fig.
+[s42484-022-00083-z.pdf]: 8 for the architecture for
+x 1 x 1 x 1.0 and x 1 1 x 1 x 1.1 qubits and ) 2 to avoid to have a network that is too
+3 2
+deep and therefore untrainable in a differentiable manner
+for x , x .0 and x .1 (see becauseofthebarrenplateauphenomenon(McCleanetal.
+[s42484-022-00083-z.pdf]: 1 1 1 1
+after A.4 for the binary representation of decimals).
+[s42484-022-00083-z.pdf]: Indeed, in order to build U from simple controlled
+QuantumMachineIntelligence(2022)4:28 Page 11 of 19 28
+Fig.8 Entangledgenerator
+composedofRY,cRYandX
+gates,withparametersvalues
+for 1 9 indicated
+alongsidethegates
+gates (with only one control qubit) the number of gates labellingtherealdata 0 0 asrealviathediscrim-
+target
+is of order 2 1 , making the generator deeper.
+[s42484-022-00083-z.pdf]: Thus inatorand D w 0 0 istheprobabilityof
+the number of gates we would have to use would be of havingthegeneratorfoolthediscriminator.Asstatedin3.4
+order 2 ,makingthegeneratorveryexpressiveyetvery fortwoancillaqubits( 2,i.e.onequbitforinner
+1 2
+hardtotrain.
+[s42484-022-00083-z.pdf]: productandonequbitforactivation)wehave
+2
+D w 0 0 D w 0 0 .
+[s42484-022-00083-z.pdf]: Example3.3 With 4,thearchitectureforourgenerator target 1 target
+is depicted in Fig.
+[s42484-022-00083-z.pdf]: 8 and the full QuGAN (generator and Bydefiningtheprojectionoftheoutputofthediscriminator
+discriminator)algorithminFig.9.
+[s42484-022-00083-z.pdf]: onto ,
+D w 0 0
+3.3Quantumadversarialgame outtargetw 1 target
+wecanalsowrite
+InGANsthegoalofthediscriminator(D)istodiscriminate
+D w 0 0 Tr
+target outtargetw
+real (R) data from the fake ones generated by the
+generator (G), while the goal of the latter is to fool the where outtargetw outtargetw outtargetw is the
+discriminator by generating fake data.
+[s42484-022-00083-z.pdf]: Here both real and densityoperatorassociatedto outtargetw .Thesamegoes
+generateddataaremodeledasquantumstates,respectively fortheprobabilityoffoolingthediscriminator,namely
+describedbytheirwavefunctions target and .Define D w 0 0 D w 0 0 2
+1
+theobjectivefunction
+Tr
+out w
+w D w 0 0 target where out w 1 D w 0 0 and
+.Themin-maxgame
+out w out w out w
+D w 0 0
+played by the Generative Adversarial network is therefore
+definedastheoptimisationproblem
+where the region is defined in 3.5.
+[s42484-022-00083-z.pdf]: (3.10)
+D w 0 0 target is the probability of w
+Fig.9 Theentireassociated
+entangledQuGAN
+28 Page 12 of 19 QuantumMachineIntelligence(2022)4:28
+Moreover, since is differentiable and given the archi- leave it to future research to integrate these improvements
+tecture of our circuits, according to the shift rule for- intoaquantumsetting.
+[s42484-022-00083-z.pdf]: mula(Schuldetal.2019),thepartialderivativesof admit
+theclosed-formrepresentations Proposition 3.5 The solution w to the min max
+1 problem 3.10 is such that the wave function satisfies
+w w w
+2 2 2 2 1,namely,foreach 0 2 1 ,
+target
+1
+w w 2 w 2 w 2 (3.11) target .
+022-00083-z.pdf]: Thus, in order to explain the
+2
+1
+0
+[s42484-022-00083-z.pdf]: (3.4)
+[s42484-022-00083-z.pdf]: (3.5)
+[s42484-022-00083-z.pdf]: (3.6)
+[s42484-022-00083-z.pdf]: (3.7)
+[s42484-022-00083-z.pdf]: (3.8)
+[s42484-022-00083-z.pdf]: (3.9)
+[s42484-022-00083-z.pdf]: (3.10)
+[s42484-022-00083-z.pdf]: (3.11)
+[s42484-022-00083-z.pdf]: (3.12)
+[s42484-022-00083-z.pdf]: (3.13)
+[s42484-022-00083-z.pdf]: (3.14)
+[s42484-022-00083-z.pdf]: (3.15)
+[s42484-022-00083-z.pdf]: (3.16)
+[s42484-022-00083-z.pdf]: (3.
+[Synthèse partielle]: Fais une synthèse claire et concise de ces passages avec reformulation académique, en conservant les références source :
+
+[s42484-022-00083-z.pdf]: so that training will be based on stochastic gradient ascent
+and descent.
+[s42484-022-00083-z.pdf]: The reason for a stochastic algorithm lies in Proof Define the density matrices target target
+the nature of w , seen as the difference between target and as well as the operator
+two probabilities to estimate.
+[s42484-022-00083-z.pdf]: A natural estimator for D w † † D w .Then
+w 1 1
+measurements/observationsis
+w Tr
+1 w target
+w 11 11
+1 Dw 0 0 target Dw 0 0 Since 1 0 I d and D w is unitary, setting
+where is the th wave function produced by the w D w † † 0 0 D w , it is straightforward to
+rewrite w as
+generator and is the th copy for the target
+target
+distribution.
+[s42484-022-00083-z.pdf]: w Tr Tr 1
+w target w
+Giventhenatureoftheproblem,twostrategiesarise:for
+fixed parameters , when training the discriminator, we since Tr 1 according to the Born Rule (Theo-
+firstminimisethelabellingerror,ie.
+[s42484-022-00083-z.pdf]: remA.1)and I .Again,wealsohave
+w w d
+max w 1
+w w 1 2 Tr w w target
+which we achieve by stochastic gradient ascent with a
+1
+learning rate 0.9.
+[s42484-022-00083-z.pdf]: Moreover, we chose to initialise 2 Tr w w target
+the weights following a Uniform distribution as w
+andfinally
+1 1 .
+[s42484-022-00083-z.pdf]: Then, when training the generator the goal is
+tofoolthediscriminator,sothat,forfixedw ,thetargetis 1
+w Tr .
+[s42484-022-00083-z.pdf]: 2 w w target
+min w
+RecallthatfortwoHermitianmatrices ,theinequality
+which is achieved by stochastic gradient descent with a Tr holdsfor 1with 1 1 1,
+learningrate 0.05.Similarlytothediscriminator,we where denotes the -norm.
+[s42484-022-00083-z.pdf]: Since and are
+w w
+initialisetheweightsas 0 2 .Ourexperiments Hermitian,weobtain(with and 1)
+seemtoindicatethatotherinitialisationassumptionsoverall
+1
+yield analogous results.
+[s42484-022-00083-z.pdf]: This choice of learning rates may w 2 w w target 1
+look arbitrary at first sight.
+[s42484-022-00083-z.pdf]: Unfortunately, there is yet
+where 1.Thustheoptimalw satisfies
+no rigorous approach to finding optimal learning rates, w w
+even in the classical machine learning / stochastic gradient 1
+max w w .
+[s42484-022-00083-z.pdf]: literature.Onecouldalsousetoolsfromannealing,i.e.start w 2 target 1
+withlargevaluesoflearningratesandslowlydecreasethem,
+Again,since 0theoptimal gives
+to go from exploration to exploitation, but we leave this to target 1
+futureinvestigations.
+[s42484-022-00083-z.pdf]: minmax w w 0
+w
+Remark3.4 IntheclassicalGANsetting,thisoptimisation which is equivalent to target 1 0, itself also
+problem may fail to converge (Goodfellow 2014).
+[s42484-022-00083-z.pdf]: Over equivalentto target ,for
+the past few years, progress has been made to improve all 0 2 1 .
+[s42484-022-00083-z.pdf]: the convergence quality of the algorithm and to improve
+its stability, using different loss functions or adding Remark 3.6 Our strategy to reach and approximate a
+regularising terms.
+[s42484-022-00083-z.pdf]: We refer the interested reader to the solution to the min max problem will be as follows: we
+corresponding papers (Arjovsky et al.
+[s42484-022-00083-z.pdf]: train the discriminator by stochastic gradient ascent
+2015;Deshpandeetal.2018;Gulrajanietal.2017;Miyato times and then train the generator times by stochastic
+etal.2018;Radfordetal.2016;Salimansetal.2016),and gradientdescentandrepeatthisetimes.
+[s42484-022-00083-z.pdf]: QuantumMachineIntelligence(2022)4:28 Page 13 of 19 28
+4Financialapplication:SVIgoesquantum (thestrikeprice )atagivenfuturetime(thematurity ).
+[s42484-022-00083-z.pdf]: Mathematically, the setup is that of a filtered probability
+We provide here a simple example of generating data in a space where representstheflow
+0 0
+financialcontextwiththeaimtoincreaseinterdisciplinarity ofinformation;onthisspace,anasset istraded
+0
+betweenquantitativefinanceandquantumcomputing.
+[s42484-022-00083-z.pdf]: and assumed to be adapted (namely is -measurable
+for each 0).
+[s42484-022-00083-z.pdf]: We further assume that there exists a
+4.1Financialbackgroundandmotivation probability ,equivalentto suchthat isa -martingale.
+[s42484-022-00083-z.pdf]: This martingale assumption is key as the Fundamental
+Some of the most standard and liquid traded financial Theorem of Asset Pricing (Delbaen and Schachermayer
+derivatives are so-called European Call and Put options.
+[s42484-022-00083-z.pdf]: 1994) in particular implies that this is equivalent to Call
+A Call (resp.
+[s42484-022-00083-z.pdf]: Put) gives its holder the right, but not the and Put prices being respectively equal, at inception of the
+obligation, to buy (resp.
+[s42484-022-00083-z.pdf]: sell) an asset at a specified price contract,to
+C max 0 and P max 0
+0 0
+where the expectation is taken under the risk-neutral
+orcomputedfromamodel),theimpliedvolatility
+probability .Undersufficientsmoothnesspropertyofthe imp
+is defined as the unique non-negative solution to the
+lawof ,differentiatingtwicetheCallpriceyieldsthatthe
+equation
+probability density function of the log stock price log
+isgivenby
+C C .
+[s42484-022-00083-z.pdf]: (4.2)
+BS imp
+2C
+(4.1)
+2 Notethatthisequationmaynotalwaysadmitasolution.
+[s42484-022-00083-z.pdf]: 0e
+However, under no-arbitrage assumptions (equivalently
+implying that the real distribution of the (log) stock price
+underboundconstraintsfor ),itdoesso.Werefer
+can in principle be recovered from options data.
+[s42484-022-00083-z.pdf]: However,
+the interested reader to the volatility bible (Gatheral 2006)
+pricesarenotquotedsmoothlyin andinterpolation
+for full explanations of these subtle details.
+[s42484-022-00083-z.pdf]: It turns out
+andextrapolationareneeded.Doingsoatthelevelorprices
+that the implied volatility is a much nicer object to work
+turns out to be rather cumbersome and market practice
+with (both practically and academically); plugging this
+usuallydoesitattheleveloftheso-calledimpliedvolatility.
+[s42484-022-00083-z.pdf]: definition into (4.1) yields that the map
+Thebasicfundamentalmodelofacontinuous-timefinancial imp
+fullycharacterisesthedistributionoflog as
+martingaleisgivenbytheBlack-Scholesmodel(Blackand
+Scholes1973),underwhich
+2C
+BS imp
+d .
+[s42484-022-00083-z.pdf]: (4.3)
+d 0 2
+0
+0e
+where 0 is the (constant) instantaneous volatility
+While a smooth input is still needed, it is
+imp
+and astandardBrownianmotionadaptedtothefiltration
+however easier than for option prices.
+[s42484-022-00083-z.pdf]: In this model, Call prices admit the closed-form
+0 is the Stochastic Volatility Inspired (SVI) parameterisation
+formula
+proposed by Gatheral (2004) (and improved in Gatheral
+CBS max 0 0 0BS log 2 andJacquier(2013)andGuoetal.
+[s42484-022-00083-z.pdf]: (2016)),wherethetotal
+0 impliedvariance SVI i 2 mp isassumedto
+where satisfy
+e if 0
+BS 1 e if 0 SVI 2 2 forany
+(4.4)
+with , where denotes
+2
+the cumulative distribution function of the Gaussian with the parameters 1 1 , 0 and .
+[s42484-022-00083-z.pdf]: With a slight abuse of notation, we shall from Theprobabilitydensityfunction(4.1)ofthelogstockprice
+now on write , where thenadmitstheclosed-formexpression(Gatheral2004)
+BS BS
+log representsthelogmoneyness.
+[s42484-022-00083-z.pdf]: 0 2
+SVI SVI
+exp
+Definition 4.1 Given a strike 0, a maturity 0 2 2
+SVI
+and a Call price (either quoted on the market (4.5)
+28 Page 14 of 19 QuantumMachineIntelligence(2022)4:28
+Fig.10 Densityoflog
+computedfrom4.5andthe
+correspondingSVItotal
+variance4.4.Theparametersare
+givenin(4.6)
+where where all the derivatives are taken with respect to .
+[s42484-022-00083-z.pdf]: 10, we plot the typical shape of the implied volatility
+SVI 1 SVI smile, together with the corresponding density for the
+2
+SVI
+followingparameters:
+2 1 1
+SVI SVI
+4 4 2
+SVI
+0.030358 0.0503815 0.1 0.3 0.048922 1.
+[s42484-022-00083-z.pdf]: (4.6)
+whichwethenconvertintobinaryform.Thisuniformdiscreti-
+4.2Numerics
+sationdoesnottakeintoaccounttheSVIprobabilitymasses
+ateachpoint,andaclearrefinementwouldbetouseaone-
+The goal of this numerical partistobeabletogeneratedis-
+dimensional quantisation of the SVI distribution.
+[s42484-022-00083-z.pdf]: Indeed,
+crete versions of the SVI probability distribution given
+the latter (see (Page`s et al.
+[s42484-022-00083-z.pdf]: 2004) for full details about the
+in (4.5).
+[s42484-022-00083-z.pdf]: Our target distribution shall be the one plotted in
+methodology)minimisesthedistance(withrespecttosome
+Fig.10,correspondingtotheparameters(4.6).SincetheQuan-
+chosen norm) between the initial distribution and its dis-
+tumGAN(likewisefortheclassicalGAN)algorithmstarts
+cretised version.
+[s42484-022-00083-z.pdf]: We leave this precise study and its error
+fromadiscretedistribution,wefirstneedtodiscretisetheSVI
+analysistofurtherresearch,inthefearthatitwouldclutter
+one.
+[s42484-022-00083-z.pdf]: Forconvenience,we normalise thedistributionon the
+thepresentdescriptionofthealgorithm.Thediscretiseddis-
+closedinterval 1 1 anddiscretisewiththeuniformgrid.
+[s42484-022-00083-z.pdf]: tribution, with qubits, together with the binary mapping,
+isplottedinFig.11andgivesrisetothewavefunction
+1
+2 1
+2 2 1
+0 2 1
+target
+0
+where,foreach 0 2 1 ,
+2 2 1
+log 1 1 .
+[s42484-022-00083-z.pdf]: 2 2
+We need metrics to monitorthe trainingof ourQuGAN
+algorithm, for example the Fidelity function (Nielsen and
+Chuang2000,Chapter9.2.2)
+2 2
+1 2 1 2
+sothatforthewavefunction(3.1) 2 1 ,
+0
+the goal is to obtain 1, which
+target
+2
+gives , for all
+0 2 1 .TheKullback-LeiblerDivergenceisalsoa
+usefulmonitoringmetric,definedas
+2 1
+Fig.11 Discretisedversionforthedistributionoflog on 1 1 KL target log 2 .
+[s42484-022-00083-z.pdf]: with24points
+0
+QuantumMachineIntelligence(2022)4:28 Page 15 of 19 28
+4.2.1Trainingandgenerateddistributions 4.2.2Results:furtherimprovements
+In the training of the QuGAN algorithm, in each epoch e, Bylookingattheobtainedresults,weareabletoobservea
+we train the discriminator 9 times and the convergenceforthetrainingroutinethatwehavefollowed.
+[s42484-022-00083-z.pdf]: The results, in Figure 4.2.1, are However,theaforementionedconvergencedoenotoccurat
+quite interesting as the QuGAN manages to overall learn theneighborhoodof0fortheKullback-LeiblerDivergence
+the SVI distribution.
+[s42484-022-00083-z.pdf]: Aside from the limited number of proxy metric, this could be explained by the shape of the
+qubits, the limitations however could be explained via the targetdistribution.Indeed,givenanytargetdistribution,the
+expressivity of our network which is only parameterised generator’s architecture will allow for reproducing exactly
+via and which is clearly not thetargetdistributiononlyforauniquesetofvariable .At
+1 9 1 4
+enough.
+[s42484-022-00083-z.pdf]: This lack of expressivity is a choice, and more thispoint,whencombiningthisunicityintermsofoptimal
+parameters deepen the network, but can create a barren solutionwiththeshapeofthetargetdistributionthatinduces
+plateau phenomenon (McClean et al.
+[s42484-022-00083-z.pdf]: 2018), where the acertaingeometryforthescorefunctionthatwearetrying
+gradient vanishes in 2 where is the depth of to optimise, there is a risk of converging at sub-optimal
+the network.
+[s42484-022-00083-z.pdf]: This would in turn require an exponentially points, i.e.
+]: First, we can set the learning rate 0.5.
+[s42484-022-00083-z.pdf]: Then, we set the learning rate 0.9.
+[s42484-022-00083-z.pdf]: Next, we set the learning rate 0.6.
+[s42484-022-00083-z.pdf]: Finally, we set the learning rate 0.5.
+[s42484-022-00083-z.pdf]: In the last step, we set the learning rate 0.9.
+[s42484-022-00083-z.pdf]: Since all of the above parameters were set to 0.5,
+[s42484-022-00083-z.pdf]: we expect that our method will converge
+to 0.9, which is the optimal value.
+[s42484-022-00083-z.pdf]: However, the convergence to 0.9 is not complete, and there is still
+some problem to be solved.
+[s42484-022-00083-z.pdf]: In fact, the convergence rate for our method is lower than that of the best
+known algorithms.
+[s42484-022-00083-z.pdf]: This is because the best known algorithms (e.g. the gradient descent)
+are able to converge to 0.9 faster than our method,
+[Synthèse partielle]: Fais une synthèse claire et concise de ces passages avec reformulation académique, en conservant les références source :
+
+[s42484-022-00083-z.pdf]: saddle points in our case.
+[s42484-022-00083-z.pdf]: Therefore, an entire
+larger number of shots to obtain a good enough estimation study on such geometry induced by the shape of the target
+of(3.11),therebycreatingatrade-offbetweenexpressivity along with the development of a strategy preventing us
+andtrainabilityinadifferentiablemanner.
+[s42484-022-00083-z.pdf]: fromfallingintosuchsaddlepointswillconstitutepotential
+futurecandidateforfurtherresearch(Fig.12).
+[s42484-022-00083-z.pdf]: 28 Page 16 of 19 QuantumMachineIntelligence(2022)4:28
+Fig.12 Evolutionof
+target target 1
+duringQuGANtraining
+All the numerics in the paper were performed using the where Tr is the Trace operator.
+[s42484-022-00083-z.pdf]: Moreover, for a given
+IBM-QiskitlibraryinPython.
+[s42484-022-00083-z.pdf]: state ,itsdensitymatrixisdefinedas .
+[s42484-022-00083-z.pdf]: A.1.QuantumFouriertransform
+Appendix A.ReviewofQuantumComputing
+techniquesandalgorithms
+Intheclassicalsetting,thediscreteFouriertransformmaps
+avector 2 to
+0 2 1
+InQuantummechanicsthestateofaphysicalsystemisrep-
+2 1
+resentedbyaketvector ofaHilbertspace ,often 1 2i
+exp for 0 2 1.
+[s42484-022-00083-z.pdf]: Therefore, for a basis 0 2 1 of , we 2 2
+0
+obtain the wave function 2 1 .
+[s42484-022-00083-z.pdf]: The Hilbert
+0
+space is endowed with the inner product between Similarly, the quantum Fourier transform is the linear
+two states and , where † is the conju- operator
+gatetranspose.Recallthatapurequantumstateisdescribed
+2 1
+byasingleketvector,whereasamixedquantumstatecannot.
+[s42484-022-00083-z.pdf]: 1 2i
+exp (A.3)
+The following are standard in Quantum Computing, and we 2 2
+0
+recall them simply to make the paper self-contained.
+[s42484-022-00083-z.pdf]: Full
+andtheoperator
+details about these concepts can be found in the excellent
+monograph(NielsenandChuang2000).
+[s42484-022-00083-z.pdf]: 2 1
+1 2i
+exp
+q
+Theorem A.1 (Born’s rule) If 2 be a pure state, 2 2
+0
+then 1.
+representstheFouriertransformmatrixwhichisunitaryas
+Given a pure state 2 1 , the probability q q † I d .Inan -qubitsystem( 2 )withbasis
+0
+of measuring collapsing onto the state for 0 2 1 ;foragivenstate ,weusethebinary
+0 2 1 isdefinedvia representation
+2 Tr 2 (A.1) 1 (A.4)
+QuantumMachineIntelligence(2022)4:28 Page 17 of 19 28
+with 0 1 sothat andeigenvaluee2i .Consideraregisterofsize ,sothat
+1 1 1
+.Likewise,thenotation0.
+[s42484-022-00083-z.pdf]: representsthe 2 and define sup 2 0. .
+[s42484-022-00083-z.pdf]: 1 2 2 1
+binaryfraction 2 .Elementaryalgebrathenyields Thus with , we obtain that 2
+1 1
+1 0.
+[s42484-022-00083-z.pdf]: 1 isthebest -bitapproximationof frombelow.
+[s42484-022-00083-z.pdf]: 1 1
+q Thequantumphaseestimationprocedureusestworegisters.
+[s42484-022-00083-z.pdf]: 22
+The first register contains the qubits initially in the
+0 e2i 0.
+[s42484-022-00083-z.pdf]: Selecting relies on the number of digits of
+accuracy for the estimate for , and the probability for
+A.2.Quantumphaseestimation(QPE) which we wish to obtain a successful phase estimation
+procedure.
+[s42484-022-00083-z.pdf]: Up to a SWAP transformation, the quantum
+The goal of QPE is to estimate the unknown phase phasecircuitgivestheoutput
+0 1 foragivenunitaryoperatorUwithaneigenvector
+0 e2i 0.
+[s42484-022-00083-z.pdf]: 1 1
+out
+22
+which is exactly equal to the Quantum Fourier Transform retrieve 2 .Algorithm2belowprovidespseudo-codefor
+forthestate 2 asinA.5,andtherefore the Quantum Phase Estimation procedure and we refer the
+1 2
+2 .SincetheQuantumFourierTransform interestedreadertoNielsenandChuang(2000,Chapter5.2)
+q
+is a unitary transformation, we can inverse the process to fordetailedexplanations.
+[s42484-022-00083-z.pdf]: Algorithm2 Quantumphaseestimation(U )
+28 Page 18 of 19 QuantumMachineIntelligence(2022)4:28
+Acknowledgements The authors would like to thank Konstantinos GatheralJ(2006)Thevolatilitysurface.APractitioner’sGuide,Wiley
+KardarasandAlexandrosPavlisforinsightfuldiscussiononquantum Finance
+algorithmsandspins.
+[s42484-022-00083-z.pdf]: GatheralJ,JacquierA(2013)Arbitrage-free,SVIvolatilitysurfaces.
+[s42484-022-00083-z.pdf]: QuantFinance14:59–71
+Goodfellow I, Pouget-Abadie J, Mirza M, Xu B, Warde-Farley D,
+Funding AJreceivedfinancialsupportfromtheEPSRCEP/T032146/1
+OzairS,CourvilleA,BengioY(2014)Generativeadversarialnets.
+[s42484-022-00083-z.pdf]: Advancesinneuralinformationprocessingsystems27
+Goodfellow IJ (2014) On distinguishability criteria for estimating
+Declarations
+generativemodelsarXiv:1412.6515
+GulrajaniI,AhmedF,ArjovskyM,DumoulinV,CourvilleAC(2017)
+Conflictofinterest Theauthorsdeclarenocompetinginterests.
+[s42484-022-00083-z.pdf]: ImprovedtrainingofWassersteinGANs.In:NeurIPS,pp5767–
+5777
+Guo G, Jacquier A, Martini C (2016) Generalised arbitrage-free
+Open Access This article is licensed under a Creative Commons
+SVIvolatilitysurfaces.SIAMJournalonFinancialMathematics
+Attribution 4.0 International License, which permits use, sharing,
+7:619–641
+adaptation,distributionandreproductioninanymediumorformat,as
+Herman D, Googin C, Liu X, Galda A, Safro I, Sun Y, Pistoia M,
+long as you give appropriate credit to the original author(s) and the
+Alexeev Y (2022) A survey of quantum computing for finance,
+source,providealinktotheCreativeCommonslicence,andindicate
+arXiv:2201.02773
+ifchangesweremade.Theimagesorotherthirdpartymaterialinthis
+HuL,WuS-H,CaiW,MaY,MuX,XuY,WangH,SongY,DengD-
+articleareincludedinthearticle’sCreativeCommonslicence,unless
+L,ZouC-L,etal.
+[s42484-022-00083-z.pdf]: (2019)Quantumgenerativeadversariallearning
+indicatedotherwiseinacreditlinetothematerial.Ifmaterialisnot
+inasuperconductingquantumcircuit.SciAdv5:27–61
+includedinthearticle’sCreativeCommonslicenceandyourintended
+Huang H-L, Du Y, Gong M, Zhao Y, Wu Y, Wang C, Li S, Liang
+useisnotpermittedbystatutoryregulationorexceedsthepermitted
+F,LinJ,XuY,YangR,LiuT,HsiehM.-H.,DengH,RongH,
+use, you will need to obtain permission directly from the copyright
+Peng C-Z, Lu C-Y, Chen Y-A, Tao D, Zhu X, Pan J-W (2021)
+holder.
+[s42484-022-00083-z.pdf]: Experimentalquantumgenerativeadversarialnetworksforimage
+org/licenses/by/4.0/.
+[s42484-022-00083-z.pdf]: generation
+KakutaniS(1941)AgeneralizationofBrouwer’sfixedpointtheorem.
+[s42484-022-00083-z.pdf]: DukeMathJ8:457–459
+References KolmogorovA(1956)Ontherepresentationofcontinuousfunctions
+of several variables by superpositions of continuous functions
+of a smaller number of variables.
+[s42484-022-00083-z.pdf]: In: Proceedings of the USSR
+AnandN,HuangP(2018)Generativemodelingforproteinstructures
+AcademyofSciences,vol108
+ICLR2018Workshop
+KondratyevA,SchwarzC(2019)ThemarketgeneratorAvailableat
+Arjovsky M, Chintala S, Bottou L (2017) Wasserstein generative
+SSRN3384948
+adversarial networks, in International conference on machine
+Koshiyama A, Firoozye N, Treleaven P (2021) Generative adver-
+learning.PMLR214–223
+sarial networks for financial trading strategies fine-tuning and
+ArnoldV(1957)Onfunctionsofthreevariables.In:Proceedingsof
+combination.QuantFinance21:797–813
+theUSSRacademyofsciences,vol114
+Lloyd S, Weedbrook C (2018) Quantum generative adversarial
+BhartiK,Cervera-LiertaA,KyawTH,HaugT,Alperin-LeaS,Anand
+learning.PhysRevLett121
+A,DegrooteM,HeimonenH,KottmannJS,MenkeT,MokW.-K.,
+MarblestoneAH,WayneG,KordingKP(2016)Towardanintegration
+Sim S, Kwek L-C, Aspuru-Guzik A (2021) Noisy intermediate-
+ofdeeplearningandneuroscience.FrontComputNeurosci10:94
+scalequantum(NISQ)algorithms
+McCleanJR,BoixoS,SmelyanskiyVN,BabbushR,NevenH(2018)
+Black F, Scholes M (1973) The pricing of options and corporate
+Barren plateaus in quantum neural network training landscapes.
+[s42484-022-00083-z.pdf]: liabilities.JPolitEcon81:637–654
+NatCommun9
+Braccia P, Caruso F, Banchi L (2021) How to enhance quantum
+Miyato T, Kataoka T, Koyama M, Yoshida Y (2018) Spectral
+generativeadversariallearningofnoisyinformation.NewJPhys
+normalizationforGANsarXiv:1802.05957
+23:053024
+MolnarC(2020)InterpretablemachinelearningLulu.com
+Buehler H, Gonon L, Teichmann J, Wood B (2019) Deep hedging.
+[s42484-022-00083-z.pdf]: QuantFinance19:1271–1291 NakajiK,YamamotoN(2021)Quantumsemi-supervisedgenerative
+Chakrabarti S, Huang Y, Li T, Feizi S, Wu X (2019) Quantum adversarial network for enhanced data classification.
+[s42484-022-00083-z.pdf]: Sci Rep
+Wassersteingenerativeadversarialnetworks 11:1–10
+Dallaire-Demers P.-L., Killoran N (2018) Quantum generative NiH,SzpruchL,WieseM,LiaoS,XiaoB(2020)ConditionalSig-
+adversarialnetworks.PhysRevA98 WassersteinGANsfortimeseriesgenerationarXiv:2006.05421
+Delbaen F, Schachermayer W (1994) A general version of the NielsenMA,ChuangIL(2000)Quantumcomputationandquantum
+fundamentaltheoremofassetpricing.MathAnn300:463–520 information.CambridgeUniversityPress,Cambridge
+Denton E, Chintala S, Szlam A, Fergus R (2015) Deep generative NiuMY,ZlokapaA,BroughtonM,BoixoS,MohseniM,Smelyanskyi
+imagemodelsusingaLaplacianpyramidofadversarialnetworks V, Neven H (2022) Entangling quantum generative adversarial
+inneurIPS networks.PhysRevLett128:220505
+Deshpande I, Zhang Z, Schwing AG (2018) Generative modeling Page`sG.,PhamH,PrintemsJ(2004)Optimalquantizationmethods
+using the sliced Wasserstein distance.
+[s42484-022-00083-z.pdf]: In: Proceedings of the andapplicationstonumericalproblems.In:Finance,inHandbook
+IEEE conference on computer vision and pattern recognition, ofComputationalandNumericalMethodsinFinance.Springer
+pp3483–3491 Radford A, Metz L, Chintala S (2016) Unsupervised representation
+Gatheral J (2004) A parsimonious arbitrage-free implied volatility learningwithdeepconvolutionalgenerativeadversarialnetworks
+parameterization with application to the valuation of volatility Ruf J, Wang W (2021) Neural networks for option pricing and
+derivatives hedging:aliteraturereview.JournalofComputationalFinance24
+QuantumMachineIntelligence(2022)4:28 Page 19 of 19 28
+SalimansT,GoodfellowI,ZarembaW,CheungV,RadfordA,Chen WangP,WangD,JiY,XieX,SongH,LiuX,LyuY,XieY(2019)
+X(2016)ImprovedtechniquesfortrainingGANsinneurIPS QGAN:Quantizedgenerativeadversarialnetworks
+Saxena D, Cao J (2021) Generative adversarial networks (gans) Wiese M, Knobloch R, Korn R, Kretschmer P (2020) Quant gan:
+challenges, solutions, and future directions.
+[s42484-022-00083-z.pdf]: ACM Computing deep generation of financial time series.
+[s42484-022-00083-z.pdf]: Quantitative Finance
+Surveys(CSUR)54:1–42 20:1419–1440
+SchawinskiK,ZhangC,ZhangH,FowlerL,SanthanamGK(2017) YuJ,LinZ,YangJ,ShenX,LuX,HuangT(2018)Generativeimage
+Generativeadversarialnetworksrecoverfeaturesinastrophysical inpaintingwithcontextualattention.In:ProceedingsoftheIEEE
+images of galaxies beyond the deconvolution limit.
+[s42484-022-00083-z.pdf]: Monthly conferenceoncomputervisionandpatternrecognition
+NoticesoftheRoyalAstronomicalSociety:Letters467 ZhavoronkovA(2019)Deeplearningenablesrapididentificationof
+Schuld M, Bergholm V, Gogolin C, Izaac J, Killoran N (2019) potentDDR1kinaseinhibitors.NatBiotechnol37:1038–1040
+Evaluatinganalyticgradientsonquantumhardware.PhysRevA99 ZoufalC,LucchiA,WoernerS(2019)Quantumgenerativeadversarial
+Situ H, He Z, Wang Y, Li L, Zheng S (2020) Quantum generative networks for learning and loading random distributions.
+[s42484-022-00083-z.pdf]: Npj
+adversarial network for generating discrete distribution.
+[s42484-022-00083-z.pdf]: Inf Sci QuantumInf5:1–9
+538:193–208
+Stein SA, Baheri B, Tischio RM, Mao Y, Guan Q, Li A, Fang B, Publisher’s note Springer Nature remains neutral with regard to
+XuS(2020)QuGAN:Agenerativeadversarialnetworkthrough jurisdictionalclaimsinpublishedmapsandinstitutionalaffiliations.
+ The second register is the one we use to
+quantummechanics.
+[s42484-022-00083-z.pdf]: We then measure the
+[s42484-022-00083-z.pdf]: The probability is given by
+[s42484-022-00083-z.pdf]: The probability of the qubit
+0 1 1
+1 0
+1 0
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+1 1
+
+uDhabi,UAE
+quantum-aware solutions, have been reported in the literature
+KrishnaKrishna.krishna@imperial.ac.uk
+(Lloyd et al.
+[s42484-022-00083-z.pdf]: A recent paper by Guo et al. (2019)
+[s42484-022-00083-z.pdf]: We focus on the case of a GAN with
+[s42484-022-00083-z.pdf]: We introduce a novel, fully connected
+quantum generatoranddiscriminator, and show that it can be
+[s42484-022-00083-z.pdf]: applied in the field of mathematical finance.
+[s42484-022-00083-z.pdf]: In particular, we show how this
+quantum generatoranddiscriminatorcanbeappliedto the case of
+[s42484-022-00083-z.pdf]: volatility modelling.
+[s42484-022-00083-z.pdf]: This approach can be used to model
+[s42484-022-00083-z.pdf]: volatility and other stochastic processes.
+[s42484-022-00083-z.pdf]: We demonstrate the accuracy of our
+[s42484-022-00083-z.pdf]: method in a wide variety of
