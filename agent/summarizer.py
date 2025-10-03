@@ -5,32 +5,32 @@ from openai import OpenAI
 # ------------------ CONFIG ------------------
 api_key = os.environ.get("OPENAI_API_KEY")
 if not api_key:
-    raise ValueError("La variable d'environnement OPENAI_API_KEY n'est pas définie.")
+    raise ValueError("The environment variable OPENAI_API_KEY is not set.")
 client = OpenAI(api_key=api_key)
 
-# ------------------ CHARGEMENT DES PARAGRAPHES ------------------
+# ------------------ LOAD PARAGRAPHS ------------------
 try:
     with open("data/text_chunks.pkl", "rb") as f:
-        paragraphs = pickle.load(f)  # liste des segments
+        paragraphs = pickle.load(f)  # list of text segments
 except FileNotFoundError:
-    raise FileNotFoundError("Le fichier 'data/text_chunks.pkl' est introuvable.")
+    raise FileNotFoundError("File 'data/text_chunks.pkl' not found.")
 
 try:
     with open("data/article_map.pkl", "rb") as f:
-        sources = pickle.load(f)     # liste des sources correspondant à chaque segment
+        sources = pickle.load(f)     # list of sources corresponding to each segment
 except FileNotFoundError:
-    sources = None  # si tu n'as pas ce fichier, ça fonctionne quand même
+    sources = None  # still works if no sources are available
 
-# ------------------ FONCTION DE SYNTHESE ------------------
+# ------------------ SYNTHESIS FUNCTION ------------------
 def synthesize_paragraphs(paragraphs, sources=None):
     combined = ""
     for i, p in enumerate(paragraphs):
-        source = sources[i] if sources else "Source inconnue"
+        source = sources[i] if sources else "Unknown source"
         combined += f"[{source}]: {p}\n"
 
     prompt = (
-        "Fais une synthèse claire et concise de ces passages "
-        "avec reformulation académique, en conservant les références source :\n\n"
+        "Create a clear and concise summary of these passages, "
+        "with academic rephrasing, keeping the source references:\n\n"
         f"{combined}"
     )
 
@@ -41,18 +41,18 @@ def synthesize_paragraphs(paragraphs, sources=None):
     )
     return response.choices[0].message.content
 
-# ------------------ BOUCLE INTERACTIVE ------------------
+# ------------------ INTERACTIVE LOOP ------------------
 if __name__ == "__main__":
     total_segments = len(paragraphs)
-    print(f"{total_segments} segments disponibles pour la synthèse (dans data\\text_chunks.pkl).")
+    print(f"{total_segments} segments available for synthesis (from data\\text_chunks.pkl).")
     
     while True:
         user_input = input(
-            "Combien de segments à synthétiser ? (entrez 'all' pour tout synthétiser, 0 pour quitter) : "
+            "How many segments to synthesize? (enter 'all' for all, 0 to quit): "
         ).strip()
 
         if user_input == "0":
-            print("Au revoir !")
+            print("Goodbye!")
             break
         elif user_input.lower() == "all":
             sample_paras = paragraphs
@@ -61,18 +61,18 @@ if __name__ == "__main__":
             try:
                 n = int(user_input)
                 if n > total_segments:
-                    print(f"Il n'y a que {total_segments} segments. Je vais synthétiser tous.")
+                    print(f"There are only {total_segments} segments. Synthesizing all.")
                     n = total_segments
                 sample_paras = paragraphs[:n]
                 sample_sources = sources[:n] if sources else None
             except ValueError:
-                print("Entrée invalide. Tapez un nombre, 'all', ou 0 pour quitter.")
+                print("Invalid input. Enter a number, 'all', or 0 to quit.")
                 continue
 
-        print("\n--- Synthèse en cours ---\n")
+        print("\n--- Generating summary ---\n")
         try:
             summary = synthesize_paragraphs(sample_paras, sample_sources)
-            print("\n--- Synthèse générée ---\n")
+            print("\n--- Generated summary ---\n")
             print(summary)
         except Exception as e:
-            print(f"[ERREUR] Impossible de générer la synthèse : {e}")
+            print(f"[ERROR] Failed to generate summary: {e}")

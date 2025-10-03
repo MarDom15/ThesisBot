@@ -6,11 +6,13 @@ import pickle
 # ------------------ CONFIG ------------------
 model = SentenceTransformer('all-MiniLM-L6-v2')
 
-# ------------------ MÉTRIQUES ------------------
+# ------------------ METRICS ------------------
 def precision_recall_at_k(predicted, relevant, k=5):
     """
-    predicted : liste des indices des passages récupérés par l'agent est ceci 
-    relevant : liste des indices des passages réellement pertinents
+    Compute precision and recall at top-k.
+    
+    predicted : list of indices retrieved by the agent
+    relevant : list of indices of truly relevant passages
     """
     pred_topk = set(predicted[:k])
     relevant_set = set(relevant)
@@ -21,7 +23,7 @@ def precision_recall_at_k(predicted, relevant, k=5):
 
 def coverage_score(synth_text, original_paragraphs):
     """
-    Mesure la similarité moyenne entre la synthèse et les paragraphes originaux
+    Measures average similarity between the synthesized text and original paragraphs.
     """
     embeddings = model.encode([synth_text] + original_paragraphs)
     synth_emb = embeddings[0]
@@ -29,13 +31,13 @@ def coverage_score(synth_text, original_paragraphs):
     sim = cosine_similarity([synth_emb], paras_emb)
     return float(np.mean(sim))
 
-# ------------------ TEST SIMPLE ------------------
+# ------------------ SIMPLE TEST ------------------
 if __name__ == "__main__":
-    # Charger quelques paragraphes pour test
+    # Load some paragraphs for testing
     with open("data/text_chunks.pkl", "rb") as f:
         paragraphs = pickle.load(f)
 
-    # Exemple simple : les 5 premiers comme pertinents
+    # Example: first 5 paragraphs are relevant
     relevant_idx = list(range(5))
     predicted_idx = list(range(3, 8))
 

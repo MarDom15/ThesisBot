@@ -5,61 +5,60 @@ from transformers import pipeline
 from sentence_transformers import SentenceTransformer
 
 # ------------------ CONFIG ------------------
-os.environ["HF_API_KEY"] = "YOUR_HF_API_KEY"   # <-- Mets ton vrai token Hugging Face
+os.environ["HF_API_KEY"] = "YOUR_HF_API_KEY"   # <-- Replace with your actual Hugging Face key
 MODEL_NAME = "tiiuae/falcon-rw-1b"
 
-# Modèle d'embeddings
+# Embedding model
 embed_model = SentenceTransformer("all-MiniLM-L6-v2")
 
-# Hugging Face pipeline (génération texte avec Falcon)
+# Hugging Face text-generation pipeline (Falcon)
 generator = pipeline(
     "text-generation",
     model=MODEL_NAME,
-    device=-1,   # CPU (-1) ou GPU (0 si CUDA dispo)
+    device=-1,   # CPU (-1) or GPU (0 if CUDA available)
     max_length=512
 )
 
-# ------------------ CHARGEMENT ------------------
-# Embeddings et index FAISS
+# ------------------ LOAD DATA ------------------
+# Embeddings and FAISS index
 with open("data/embeddings.pkl", "rb") as f:
     embeddings = pickle.load(f)
 
 index = faiss.read_index("data/index.faiss")
 
-# Chargement des textes
+# Load paragraphs
 with open("data/text_chunks.pkl", "rb") as f:
-    paragraphs = pickle.load(f)  # liste de paragraphes
-    sources = ["inconnu"] * len(paragraphs)  # si pas de sources précises
+    paragraphs = pickle.load(f)  
+    sources = ["unknown"] * len(paragraphs)  # fallback if no sources available
 
-# ------------------ FONCTIONS ------------------
+# ------------------ FUNCTIONS ------------------
 def retrieve_top_paragraphs(question, paragraphs, embeddings, index, top_k=10, subject=None):
     """
-    Recherche les passages les plus pertinents dans l'index FAISS.
-    top_k = nombre de passages à récupérer
+    Retrieve the top-k most relevant paragraphs from FAISS.
     """
     q_text = f"{question}"
     if subject:
-        q_text = f"Sujet de thèse : {subject}\nQuestion : {question}"
+        q_text = f"Thesis topic: {subject}\nQuestion: {question}"
     
     q_emb = embed_model.encode([q_text])
     D, I = index.search(q_emb, top_k)
     
-    # Filtrer les indices valides
+    # Get valid indices
     results = [paragraphs[int(i)] for i in I[0] if int(i) < len(paragraphs)]
     if not results:
-        results = ["Aucun passage pertinent trouvé dans les documents."]
+        results = ["No relevant passages found in the documents."]
     
-    # Debug
-    print(f"[DEBUG] Indices trouvés : {I.tolist()}")
-    print(f"[DEBUG] Distances : {D.tolist()}")
+    # Debug info
+    print(f"[DEBUG] Indices found: {I.tolist()}")
+    print(f"[DEBUG] Distances: {D.tolist()}")
     
     return results
 
-def reformulate_text(text, style="académique"):
+def reformulate_text(text, style="academic"):
     """
-    Reformule un texte pour un style académique et sans plagiat.
+    Reformulate a paragraph in an academic style without plagiarism.
     """
-    prompt = f"Reformule ce texte pour qu'il soit utilisable dans une thèse avec style {style} et sans plagiat :\n\n{text}"
+    prompt = f"Rephrase this text so it can be used in a thesis with {style} style and no plagiarism:\n\n{text}"
     result = generator(
         prompt,
         max_new_tokens=200,
@@ -70,22 +69,22 @@ def reformulate_text(text, style="académique"):
     )
     return result[0]["generated_text"]
 
-# ------------------ BOUCLE INTERACTIVE ------------------
+# ------------------ INTERACTIVE LOOP ------------------
 if __name__ == "__main__":
-    subject = input("Entrez le sujet de votre thèse (optionnel) : ").strip()
+    subject = input("Enter your thesis topic (optional): ").strip()
     
     while True:
-        question = input("\nPosez votre question (ou tapez 'exit') : ")
+        question = input("\nAsk your question (or type 'exit'): ")
         if question.lower() == "exit":
             break
 
         top_paras = retrieve_top_paragraphs(question, paragraphs, embeddings, index, top_k=10, subject=subject)
         
-        print("\n--- Top passages trouvés ---")
+        print("\n--- Top retrieved paragraphs ---")
         for i, para in enumerate(top_paras, 1):
             print(f"[{i}] {para}\n")
         
-        print("\n--- Reformulations ---")
+        print("\n--- Reformulated paragraphs ---")
         for i, para in enumerate(top_paras, 1):
             reformulated = reformulate_text(para)
             print(f"[{i}] {reformulated}\n")
