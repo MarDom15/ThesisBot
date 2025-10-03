@@ -156,12 +156,12 @@ In quantitative finance, integrating quantum ML can significantly accelerate opt
 
 ## Demo
 
-Watch the demo video of ThesisBot in action:
+## Demo Video
 
-<video width="600" controls>
-  <source src="https://github.com/MarDom15/ThesisBot/blob/main/vg.mp4?raw=true" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
+Check out this demo of ThesisBot in action:
+
+[![Watch the demo video](https://img.youtube.com/vi/rUhj7fsulwI/0.jpg)](https://youtu.be/rUhj7fsulwI)
+
 
 
 ---
