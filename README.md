@@ -162,6 +162,9 @@ Check out this demo of ThesisBot in action:
 
 [![Watch the demo video](https://img.youtube.com/vi/rUhj7fsulwI/0.jpg)](https://youtu.be/rUhj7fsulwI)
 
+⚠️ **Note:**  
+If you see errors in the demo, they are likely caused by a **missing OpenAI API key**.  
+Make sure to set your environment variable `OPENAI_API_KEY` before running the demo.
 
 
 ---
